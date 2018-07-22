@@ -31,7 +31,7 @@ def pluck_history_response(response):
 def send_request(request):
     return urllib.urlopen(request)
 
-def fetch_spacetime_point(data):
+def _fetch_spacetime_point(data):
     d = data['Data.Date'][:10]
     return SpacetimePoint(
         Coordinate(
@@ -40,42 +40,48 @@ def fetch_spacetime_point(data):
         date(int(d[:4]), int(d[5:7]), int(d[8:10]))
         )
 
-def fetch_spacetime_point_by_device_id(filename):
+def fetch_spacetime_point(filename):
     with open(filename, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
-        return { filename.split('_')[0] : fetch_spacetime_point(next(reader))}
+        return _fetch_spacetime_point(next(reader))
 
-def write_to_csv(weather_summary_by_device_id):
+def write_to_csv(device_id, date, weather):
     with open('natalie-weather-api.csv', 'w') as csvfile:
         fieldnames = ['device_id', 'date', 'mean_temp', 'max_temp', 'min_temp', 'precip']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        for device_id, weather in weather_summary_by_device_id.iteritems():
-            writer.writerow(
-                {'device_id': device_id,
-                 'date': 'test-date',
-                 'mean_temp': weather.mean_temp,
-                 'max_temp': weather.max_temp,
-                 'min_temp': weather.min_temp,
-                 'precip': weather.precipitation}
-                )
+        writer.writerow(
+            {'device_id': device_id,
+             'date': date,
+             'mean_temp': weather.mean_temp,
+             'max_temp': weather.max_temp,
+             'min_temp': weather.min_temp,
+             'precip': weather.precipitation}
+        )
+
+def get_device_id(filename):
+    """Returns the ID of the device in 'filename'.
+
+    >>> get_device_id('11423412_2018-22-07_json.csv')
+    11423412
+    """
+    return filename.split('_')[0]
 
 if __name__ == '__main__':
 
-    point_by_device_id = fetch_spacetime_point_by_device_id('sample.csv')
-
+    filename = '11643577_2017-08-03_json.csv'
     
-    request_by_device_id = { device_id : make_history_request(
+    device_id = get_device_id(filename)
+    
+    spacetime_point = fetch_spacetime_point(filename)
+    
+    history_request = make_history_request(
             API_KEY,
-            point.date,
-            point.coordinate) for device_id, point in point_by_device_id.iteritems() }
+            spacetime_point.date,
+            spacetime_point.coordinate)
     
-    response_by_device_id = { device_id: send_request(request)
-                              for device_id, request in request_by_device_id.iteritems() }
+    history_response = send_request(history_request)
     
-    weather_summary_by_device_id = { device_id : pluck_history_response(response)
-                                     for device_id, response in response_by_device_id.iteritems() }
+    weather_summary = pluck_history_response(history_response)
 
-    write_to_csv(weather_summary_by_device_id)
-
-    print(weather_summary_by_device_id)
+    write_to_csv(device_id, spacetime_point.date, weather_summary)
