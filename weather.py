@@ -8,9 +8,8 @@ from collections import namedtuple
 import json
 from datetime import date
 
-Coordinate = namedtuple('Coordinate', 'latitude longitude')
 WeatherSummary = namedtuple('WeatherSummary', 'mean_temp max_temp min_temp precipitation')
-SpacetimePoint = namedtuple('SpacetimePoint', 'coordinate date')
+SpacetimePoint = namedtuple('SpacetimePoint', 'latitude longitude date')
 
 API_KEY = '88e2f56333477b74'
 
@@ -18,8 +17,8 @@ def _make_history_request(api_key, point):
     return 'http://api.wunderground.com/api/{0}/history_{1}/q/{2},{3}.json'.format(
         api_key,
         point.date.strftime('%Y%m%d'),
-        point.coordinate.latitude,
-        point.coordinate.longitude)
+        point.latitude,
+        point.longitude)
 
 def _pluck_history_response(response):
     data = json.load(response)['history']['dailysummary'][0]
@@ -36,11 +35,10 @@ def _send_request(request):
 def _fetch_spacetime_point(data):
     d = data['Data.Date'][:10]
     return SpacetimePoint(
-        Coordinate(
-            data['Data.Latitude'],
-            data['Data.Longitude']),
+        data['Data.Latitude'],
+        data['Data.Longitude'],
         date(int(d[:4]), int(d[5:7]), int(d[8:10]))
-        )
+    )
 
 def fetch_spacetime_point(filename):
     with open(filename, 'r') as csvfile:
