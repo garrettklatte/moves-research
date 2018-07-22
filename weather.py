@@ -66,7 +66,7 @@ def get_device_id(filename):
     """Returns the ID of the device in 'filename'.
 
     >>> get_device_id('11423412_2018-22-07_json.csv')
-    11423412
+    '11423412'
     """
     return filename.split('_')[0]
 
@@ -79,6 +79,26 @@ def fetch_weather_summary(api_key, spacetime_point):
     
     return _pluck_history_response(history_response)
 
+def valid_file(filename):
+    """Use this function to filter out files that should not be analyzed.
+
+    >>> valid_file('123432_2018-09-03_json.csv')
+    True
+    >>> valid_file('NA_2016-12-11_json.csv')
+    False
+    >>> valid_file('cancelled_2015-01-01_json.csv')
+    False
+    """
+    tokens = filename.split('_')
+
+    if tokens[0] == 'NA':
+        return False
+
+    if tokens[0] == 'cancelled':
+        return False
+
+    return True
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -86,8 +106,10 @@ if __name__ == '__main__':
     parser.add_argument('files', nargs='+', help='files to be processed')
     args = parser.parse_args()
 
+    valid_files = [file for file in args.files if valid_file(file)]
+    
     id_and_spacetime_point_list = [(get_device_id(filename), fetch_spacetime_point(filename))
-                                   for filename in args.files ]
+                                   for filename in valid_files]
 
     weather_by_id_and_spacetime = {(id, point): fetch_weather_summary(API_KEY, point)
                                    for id, point in id_and_spacetime_point_list}
