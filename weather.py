@@ -52,14 +52,14 @@ def write_to_csv(weather_by_id_and_spacetime, filename):
 
         writer.writeheader()
 
-        for (device_id, point), weather in weather_by_id_and_spacetime.iteritems():
+        for (device_id, spacetime_point), weather_summary in weather_by_id_and_spacetime.iteritems():
             writer.writerow(
                 {'device_id': device_id,
-                 'date': point.date,
-                 'mean_temp': weather.mean_temp,
-                 'max_temp': weather.max_temp,
-                 'min_temp': weather.min_temp,
-                 'precip': weather.precipitation}
+                 'date': spacetime_point.date,
+                 'mean_temp': weather_summary.mean_temp,
+                 'max_temp': weather_summary.max_temp,
+                 'min_temp': weather_summary.min_temp,
+                 'precip': weather_summary.precipitation}
             )
 
 def get_device_id(filename):
