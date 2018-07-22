@@ -1,3 +1,4 @@
+import argparse
 import urllib
 import re
 import time
@@ -13,22 +14,23 @@ SpacetimePoint = namedtuple('SpacetimePoint', 'coordinate date')
 
 API_KEY = '88e2f56333477b74'
 
-def make_history_request(api_key, date, coordinate):
+def _make_history_request(api_key, point):
     return 'http://api.wunderground.com/api/{0}/history_{1}/q/{2},{3}.json'.format(
         api_key,
-        date.strftime('%Y%m%d'),
-        coordinate.latitude,
-        coordinate.longitude)
+        point.date.strftime('%Y%m%d'),
+        point.coordinate.latitude,
+        point.coordinate.longitude)
 
-def pluck_history_response(response):
+def _pluck_history_response(response):
     data = json.load(response)['history']['dailysummary'][0]
+
     return WeatherSummary(
         data['meantempi'],
         data['maxtempi'],
         data['mintempi'],
         data['precipi'])
 
-def send_request(request):
+def _send_request(request):
     return urllib.urlopen(request)
 
 def _fetch_spacetime_point(data):
@@ -45,19 +47,22 @@ def fetch_spacetime_point(filename):
         reader = csv.DictReader(csvfile)
         return _fetch_spacetime_point(next(reader))
 
-def write_to_csv(device_id, date, weather):
-    with open('natalie-weather-api.csv', 'w') as csvfile:
+def write_to_csv(weather_by_id_and_spacetime, filename):
+    with open(filename, 'w') as csvfile:
         fieldnames = ['device_id', 'date', 'mean_temp', 'max_temp', 'min_temp', 'precip']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        writer.writerow(
-            {'device_id': device_id,
-             'date': date,
-             'mean_temp': weather.mean_temp,
-             'max_temp': weather.max_temp,
-             'min_temp': weather.min_temp,
-             'precip': weather.precipitation}
-        )
+        writer.writeheader()
+
+        for (device_id, point), weather in weather_by_id_and_spacetime.iteritems():
+            writer.writerow(
+                {'device_id': device_id,
+                 'date': point.date,
+                 'mean_temp': weather.mean_temp,
+                 'max_temp': weather.max_temp,
+                 'min_temp': weather.min_temp,
+                 'precip': weather.precipitation}
+            )
 
 def get_device_id(filename):
     """Returns the ID of the device in 'filename'.
@@ -67,21 +72,26 @@ def get_device_id(filename):
     """
     return filename.split('_')[0]
 
+def fetch_weather_summary(api_key, spacetime_point):
+    history_request = _make_history_request(
+        api_key,
+        spacetime_point)
+    
+    history_response = _send_request(history_request)
+    
+    return _pluck_history_response(history_response)
+
 if __name__ == '__main__':
 
-    filename = '11643577_2017-08-03_json.csv'
-    
-    device_id = get_device_id(filename)
-    
-    spacetime_point = fetch_spacetime_point(filename)
-    
-    history_request = make_history_request(
-            API_KEY,
-            spacetime_point.date,
-            spacetime_point.coordinate)
-    
-    history_response = send_request(history_request)
-    
-    weather_summary = pluck_history_response(history_response)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('out', help='name of the outputted csv file')
+    parser.add_argument('files', nargs='+', help='files to be processed')
+    args = parser.parse_args()
 
-    write_to_csv(device_id, spacetime_point.date, weather_summary)
+    id_and_spacetime_point_list = [(get_device_id(filename), fetch_spacetime_point(filename))
+                                   for filename in args.files ]
+
+    weather_by_id_and_spacetime = {(id, point): fetch_weather_summary(API_KEY, point)
+                                   for id, point in id_and_spacetime_point_list}
+
+    write_to_csv(weather_by_id_and_spacetime, args.out)
