@@ -107,7 +107,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     valid_files = [file for file in args.files if valid_file(file)]
-    
+
     id_and_spacetime_point_list = [(get_device_id(filename), fetch_spacetime_point(filename))
                                    for filename in valid_files]
 
