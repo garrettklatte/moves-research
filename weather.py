@@ -72,7 +72,10 @@ class WeatherUndergroundGateway:
 def extract_spacetime_point(filename):
     with open(filename, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
-        return _fetch_spacetime_point(next(reader))
+        try:
+            return _fetch_spacetime_point(next(reader))
+        except KeyError:
+            return None
 
 def _fetch_spacetime_point(data):
     d = data['Data.Date'][:10]
@@ -137,14 +140,16 @@ def log_spacetime_points():
 
     spacetime_points = [extract_spacetime_point(filename) for filename in valid_files]
 
+    valid_points = [point for point in spacetime_points if point]
+
     with open(args.out, 'w') as out:
         writer = csv.DictWriter(out, fieldnames=['latitude', 'longitude', 'date'])
         writer.writeheader()
-        for spacetime_point in spacetime_points:
+        for valid_point in valid_points:
             writer.writerow({
-                'latitude': spacetime_point.latitude,
-                'longitude': spacetime_point.longitude,
-                'date': spacetime_point.date.isoformat()
+                'latitude': valid_point.latitude,
+                'longitude': valid_point.longitude,
+                'date': valid_point.date.isoformat()
             })
 
 if __name__ == '__main__':
