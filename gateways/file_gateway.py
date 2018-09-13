@@ -1,7 +1,7 @@
 """Module for file_gateway."""
 
 class FileGateway:
-    """Interface for persisting files to local storage."""
+    """Interface for interacting with files that are locally stored."""
     def __init__(self, file_path):
         self._file_path = file_path
         
