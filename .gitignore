@@ -1,2 +1,5 @@
 # virtualenv folder
 venv
+
+# pytest
+.pytest_cache
