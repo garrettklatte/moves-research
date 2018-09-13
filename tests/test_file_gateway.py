@@ -20,7 +20,7 @@ def test_identifies_invalid_fiels(filename):
 def test_makes_filename():
     point = SpacetimePoint(123.43, -54.345, date(2018, 1, 1))
     file_path = '/home/gklatte'
-    filename = FileGateway._make_filename(point, file_path)
+    filename = FileGateway._create_filename(point, file_path)
     expected_filename = '/home/gklatte/123.43_-54.345_2018-01-01.json'
 
     assert expected_filename == filename

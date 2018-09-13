@@ -22,8 +22,9 @@ class FileGateway:
                 for valid_file in valid_files]
 
     @staticmethod
-    def _make_filename(spacetime_point, file_path):
-        """
+    def _create_filename(spacetime_point, file_path):
+        """Create a absolute filename based on 'spacetime_point' and
+        'file_path'.
         """
         point_string = '{latitude}_{longitude}_{date_string}.json'.format(
             latitude=spacetime_point.latitude,
