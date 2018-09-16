@@ -1,11 +1,16 @@
 from datetime import date
-from definitions import SpacetimePoint, WeatherSummary
+from definitions import SubjectLocationSummary, WeatherSummary
 from gateways import WeatherGateway
 
 def test_makes_history_request():
     api_key = '123345'
-    point = SpacetimePoint(34.9, 109.2, date(2018, 1, 1))
-    request = WeatherGateway._make_history_request(api_key, point)
+    summary = SubjectLocationSummary(
+        subject_id='123123123',
+        longitude=109.2,
+        latitude=34.9,
+        date=date(2018, 1, 1)
+    )
+    request = WeatherGateway._make_history_request(api_key, summary)
 
     expected_request = ('http://api.wunderground.com/api/123345/history_20180101'
                         '/q/34.9,109.2.json')
