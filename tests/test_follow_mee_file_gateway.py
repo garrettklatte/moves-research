@@ -39,7 +39,7 @@ def test_extracts_subject_id(filename):
 
     assert expected_subject_id == subject_id
 
-def test_itegration__extracts_subject_location_summary():
+def test_integration_extracts_subject_location_summary():
     expected = SubjectLocationSummary(
         '98123345',
         -73.935242,
