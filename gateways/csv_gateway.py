@@ -57,7 +57,6 @@ class CsvGateway:
 
     @staticmethod
     def _extract_subject_location_summary(row):
-        print(row)
         return SubjectLocationSummary(
             row['subject_id'],
             float(row['longitude']),
