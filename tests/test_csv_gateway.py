@@ -40,6 +40,25 @@ def test_extracts_weather_summary():
 
     assert expected == actual
 
+def test_handles_nonfloat_weather_summary_value():
+    expected = WeatherSummary(
+        20.1,
+        30.4,
+        10.9,
+        None
+    )
+
+    row = {
+        'mean_temp': expected.mean_temp,
+        'max_temp': expected.max_temp,
+        'min_temp': expected.min_temp,
+        'precipitation': 'T'
+    }
+
+    actual = CsvGateway._extract_weather_summary(row)
+
+    assert expected == actual
+    
 def test_integration_records_weather_summary():
     csv_gateway = CsvGateway('/tmp/test_integration_csv_gateway.csv')
 

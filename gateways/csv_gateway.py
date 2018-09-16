@@ -66,11 +66,28 @@ class CsvGateway:
 
     @staticmethod
     def _extract_weather_summary(row):
+        try:
+            mean_temp = float(row['mean_temp'])
+        except ValueError:
+            mean_temp = None
+        try:
+            min_temp = float(row['min_temp'])
+        except ValueError:
+            min_temp = None
+        try:
+            max_temp = float(row['max_temp'])
+        except ValueError:
+            max_temp = None
+        try:
+            precipitation = float(row['precipitation'])
+        except ValueError:
+            precipitation = None
+            
         return WeatherSummary(
-            float(row['mean_temp']),
-            float(row['max_temp']),
-            float(row['min_temp']),
-            float(row['precipitation'])
+            mean_temp,
+            max_temp,
+            min_temp,
+            precipitation
         )
 
     @staticmethod
