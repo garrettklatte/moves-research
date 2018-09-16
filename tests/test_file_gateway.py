@@ -14,7 +14,7 @@ def test_identifies_valid_files(filename):
     'NA_2016-12-11_json.csv',
     'cancelled_2015-01-01_json.csv'
     ])
-def test_identifies_invalid_fiels(filename):
+def test_identifies_invalid_files(filename):
     assert not FileGateway._valid_file(filename)
                   
 def test_makes_filename():
