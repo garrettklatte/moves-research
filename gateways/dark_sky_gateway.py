@@ -66,11 +66,11 @@ class DarkSkyGateway:
             apparent_min_temp = None
         try:
             precip_intensities = [data['precipIntensity'] for data in
-                                  response['hourly']['data']] 
+                                  response['hourly']['data']]
             precipitation = sum(precip_intensities)
         except KeyError:
             precipitation = None
-            
+
         return WeatherSummary(
             mean_temp,
             max_temp,
@@ -80,4 +80,3 @@ class DarkSkyGateway:
             apparent_max_temp,
             apparent_min_temp
         )
-
