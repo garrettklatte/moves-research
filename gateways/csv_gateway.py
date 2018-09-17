@@ -17,10 +17,10 @@ class CsvGateway:
             'mean_temp',
             'max_temp',
             'min_temp',
-            'precipitation',
             'apparent_mean_temp',
             'apparent_max_temp',
-            'apparent_min_temp'
+            'apparent_min_temp',
+            'precipitation'
         ]
 
         try:
@@ -29,7 +29,7 @@ class CsvGateway:
                 writer.writeheader()
         except FileExistsError:
             pass
-        
+
     def record_weather_summary(self, weather_summary, subject_location_summary):
         """Record 'weather_summary' and associate it with
         'subject_location_summary'.
@@ -56,7 +56,7 @@ class CsvGateway:
                 if extracted_summary == subject_location_summary:
                     return CsvGateway._extract_weather_summary(row)
             else:
-                return None    
+                return None
 
     @staticmethod
     def _extract_subject_location_summary(row):
@@ -97,7 +97,7 @@ class CsvGateway:
             apparent_min_temp = float(row['apparent_min_temp'])
         except ValueError:
             apparent_min_temp = None
-            
+
         return WeatherSummary(
             mean_temp,
             max_temp,
@@ -115,11 +115,11 @@ class CsvGateway:
             'longitude': subject_location_summary.longitude,
             'latitude': subject_location_summary.latitude,
             'date': subject_location_summary.date.isoformat(),
-            'mean_temp': weather_summary.mean_temp,
-            'max_temp': weather_summary.max_temp,
-            'min_temp': weather_summary.min_temp,
-            'precipitation': weather_summary.precipitation,
-            'apparent_mean_temp': weather_summary.apparent_mean_temp,
-            'apparent_max_temp': weather_summary.apparent_max_temp,
-            'apparent_min_temp': weather_summary.apparent_min_temp,            
+            'mean_temp': format(weather_summary.mean_temp, '.2f'),
+            'max_temp': format(weather_summary.max_temp, '.2f'),
+            'min_temp': format(weather_summary.min_temp, '.2f'),
+            'precipitation': format(weather_summary.precipitation, '.4f'),
+            'apparent_mean_temp': format(weather_summary.apparent_mean_temp, '.2f'),
+            'apparent_max_temp': format(weather_summary.apparent_max_temp, '.2f'),
+            'apparent_min_temp': format(weather_summary.apparent_min_temp, '.2f')
         }
