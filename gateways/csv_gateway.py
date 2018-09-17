@@ -110,16 +110,45 @@ class CsvGateway:
 
     @staticmethod
     def _make_row(weather_summary, subject_location_summary):
+        try:
+            mean_temp = format(weather_summary.mean_temp, '.2f')
+        except TypeError:
+            mean_temp = None
+        try:
+            max_temp = format(weather_summary.max_temp, '.2f')
+        except TypeError:
+            max_temp = None
+        try:
+            min_temp = format(weather_summary.min_temp, '.2f')
+        except TypeError:
+            min_temp = None
+        try:
+            precipitation = format(weather_summary.precipitation, '.4f')
+        except TypeError:
+            precipitation = None
+        try:
+            apparent_mean_temp = format(weather_summary.apparent_mean_temp, '.2f')
+        except TypeError:
+            apparent_mean_temp = None
+        try:
+            apparent_max_temp = format(weather_summary.apparent_max_temp, '.2f')
+        except TypeError:
+            apparent_max_temp = None
+        try:
+            apparent_min_temp = format(weather_summary.apparent_min_temp, '.2f')
+        except TypeError:
+            apparent_min_temp = None
+
         return {
             'subject_id': subject_location_summary.subject_id,
             'longitude': subject_location_summary.longitude,
             'latitude': subject_location_summary.latitude,
             'date': subject_location_summary.date.isoformat(),
-            'mean_temp': format(weather_summary.mean_temp, '.2f'),
-            'max_temp': format(weather_summary.max_temp, '.2f'),
-            'min_temp': format(weather_summary.min_temp, '.2f'),
-            'precipitation': format(weather_summary.precipitation, '.4f'),
-            'apparent_mean_temp': format(weather_summary.apparent_mean_temp, '.2f'),
-            'apparent_max_temp': format(weather_summary.apparent_max_temp, '.2f'),
-            'apparent_min_temp': format(weather_summary.apparent_min_temp, '.2f')
+            'mean_temp': mean_temp,
+            'max_temp': max_temp,
+            'min_temp': min_temp,
+            'precipitation': precipitation,
+            'apparent_mean_temp': apparent_mean_temp,
+            'apparent_max_temp': apparent_max_temp,
+            'apparent_min_temp': apparent_min_temp
         }

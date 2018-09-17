@@ -9,7 +9,7 @@ def test_extracts_subject_location_summary():
         34.0522,
         date(1995, 6, 20)
     )
-        
+
     row = {
         'subject_id': expected.subject_id,
         'longitude': expected.longitude,
@@ -54,7 +54,7 @@ def test_handles_nonfloat_weather_summary_value():
         None,
         None,
         None,
-        None        
+        None
     )
 
     row = {
@@ -70,7 +70,7 @@ def test_handles_nonfloat_weather_summary_value():
     actual = CsvGateway._extract_weather_summary(row)
 
     assert expected == actual
-    
+
 def test_integration_records_weather_summary():
     csv_gateway = CsvGateway('/tmp/test_integration_csv_gateway.csv')
 
@@ -90,7 +90,7 @@ def test_integration_records_weather_summary():
         34.0522,
         date(1995, 6, 20)
     )
-    
+
     csv_gateway.record_weather_summary(
         expected_weather_summary,
         subject_location_summary
@@ -99,5 +99,38 @@ def test_integration_records_weather_summary():
     weather_summary = csv_gateway.fetch_weather_summary(
         subject_location_summary
     )
-    
+
     assert expected_weather_summary == weather_summary
+
+def test_makes_row():
+    expected_row = {
+        'subject_id': '904299266',
+        'longitude': -118.2437,
+        'latitude': 34.0522,
+        'date': '1995-06-20',
+        'mean_temp': '1.10',
+        'max_temp': '12.43',
+        'min_temp': '0.05',
+        'apparent_mean_temp': None,
+        'apparent_max_temp': None,
+        'apparent_min_temp': None,
+        'precipitation': '0.3300'
+    }
+
+    weather_summary = WeatherSummary(
+        1.1,
+        12.43112,
+        0.049,
+        0.33
+    )
+
+    subject_location_summary = SubjectLocationSummary(
+        expected_row['subject_id'],
+        expected_row['longitude'],
+        expected_row['latitude'],
+        date(1995, 6, 20)
+    )
+
+    row = CsvGateway._make_row(weather_summary, subject_location_summary)
+
+    assert expected_row == row
