@@ -31,8 +31,6 @@ def get_weather_history(api_key):
             unprocessed_location,
             api_key
         )
-
-        print(weather_summary)
         
         csvGateway.record_weather_summary(
             weather_summary,
