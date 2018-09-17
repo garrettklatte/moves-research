@@ -15,7 +15,7 @@ class DarkSkyGateway:
             api_key
         )
 
-        response = requests.get(request)
+        response = requests.get(request).json()
 
         return DarkSkyGateway._pluck_response(response)
 
@@ -25,7 +25,8 @@ class DarkSkyGateway:
         data at 'subject_location_summary'.
         """
         return ('https://api.darksky.net/forecast/{api_key}/{latitude},'
-                '{longitude},{date}T00:00:00').format(
+                '{longitude},{date}T00:00:00?exclude=currently,minutely,'
+                'hourly,alerts,flags').format(
                     api_key=api_key,
                     date=subject_location_summary.date.isoformat(),
                     latitude=subject_location_summary.latitude,
@@ -35,10 +36,23 @@ class DarkSkyGateway:
     @staticmethod
     def _pluck_response(response):
         """Pluck the WeatherSummary from 'response'."""
+        try:
+            max_temp = response['daily']['data'][0]['apparentTemperatureHigh']
+        except KeyError:
+            max_temp = None
+        try:
+            min_temp = response['daily']['data'][0]['apparentTemperatureLow']
+        except KeyError:
+            min_temp = None
+        try:
+            precipitation = response['daily']['data'][0]['precipIntensity']
+        except KeyError:
+            precipitation = None
+            
         return WeatherSummary(
-            -999,
-            response['daily']['data']['apparentTemperatureHigh'],
-            response['daily']['data']['apparentTemperatureLow'],
-            response['daily']['data']['precipIntensity']
+            None,
+            max_temp,
+            min_temp,
+            precipitation
         )
 
