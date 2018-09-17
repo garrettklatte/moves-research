@@ -26,7 +26,7 @@ class DarkSkyGateway:
         """
         return ('https://api.darksky.net/forecast/{api_key}/{latitude},'
                 '{longitude},{date}T00:00:00?exclude=currently,minutely,'
-                'hourly,alerts,flags').format(
+                'alerts,flags').format(
                     api_key=api_key,
                     date=subject_location_summary.date.isoformat(),
                     latitude=subject_location_summary.latitude,
@@ -37,22 +37,47 @@ class DarkSkyGateway:
     def _pluck_response(response):
         """Pluck the WeatherSummary from 'response'."""
         try:
-            max_temp = response['daily']['data'][0]['apparentTemperatureHigh']
+            temperatures = [data['temperature'] for data in
+                            response['hourly']['data']]
+            mean_temp = sum(temperatures)/len(temperatures)
+        except:
+            mean_temp = None
+        try:
+            max_temp = response['daily']['data'][0]['temperatureHigh']
         except KeyError:
             max_temp = None
         try:
-            min_temp = response['daily']['data'][0]['apparentTemperatureLow']
+            min_temp = response['daily']['data'][0]['temperatureLow']
         except KeyError:
             min_temp = None
         try:
-            precipitation = response['daily']['data'][0]['precipIntensity']
+            apparent_temperatures = [data['apparentTemperature'] for data in
+                                     response['hourly']['data']]
+            apparent_mean_temp = sum(apparent_temperatures)/len(apparent_temperatures)
+        except:
+            apparent_mean_temp = None
+        try:
+            apparent_max_temp = response['daily']['data'][0]['apparentTemperatureHigh']
+        except KeyError:
+            apparent_max_temp = None
+        try:
+            apparent_min_temp = response['daily']['data'][0]['apparentTemperatureLow']
+        except KeyError:
+            apparent_min_temp = None
+        try:
+            precip_intensities = [data['precipIntensity'] for data in
+                                  response['hourly']['data']] 
+            precipitation = sum(precip_intensities)
         except KeyError:
             precipitation = None
             
         return WeatherSummary(
-            None,
+            mean_temp,
             max_temp,
             min_temp,
-            precipitation
+            precipitation,
+            apparent_mean_temp,
+            apparent_max_temp,
+            apparent_min_temp
         )
 
