@@ -1,9 +1,10 @@
+import argparse
 import os
 import time
 
-from gateways import CsvGateway, FollowMeeFileGateway, WeatherGateway
+from gateways import CsvGateway, FollowMeeFileGateway, DarkSkyGateway
 
-def get_weather_history():
+def get_weather_history(api_key):
     downloaded_files_path = '/vagrant/Downloaded Files'
 
     files = [os.path.join(downloaded_files_path, downloaded_file)
@@ -11,7 +12,7 @@ def get_weather_history():
 
     print('Total number of downloaded files: {}'.format(len(files)))
     
-    csvGateway = CsvGateway('all_data.csv')
+    csvGateway = CsvGateway('dark_sky_data.csv')
     
     locations = [FollowMeeFileGateway.extract_subject_location_summary(f) for f
                  in files if FollowMeeFileGateway.extract_subject_location_summary(f)]
@@ -25,16 +26,10 @@ def get_weather_history():
         unprocessed_locations
     )))
     
-    count = 0
-    
     for unprocessed_location in unprocessed_locations:
-        print(f'Count: {count}')
-        
-        if count > 400:
-            return
-
-        weather_summary = WeatherGateway.fetch_weather_summary(
-            unprocessed_location
+        weather_summary = DarkSkyGateway.fetch_weather_summary(
+            unprocessed_location,
+            api_key
         )
 
         print(weather_summary)
@@ -44,9 +39,9 @@ def get_weather_history():
             unprocessed_location
         )
 
-        time.sleep(6.1)
-        
-        count += 1
-
 if __name__ == '__main__':
-    get_weather_history()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('api_key')
+    args = parser.parse_args()
+    
+    get_weather_history(args.api_key)
