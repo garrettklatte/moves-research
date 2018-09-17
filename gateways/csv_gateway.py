@@ -17,7 +17,10 @@ class CsvGateway:
             'mean_temp',
             'max_temp',
             'min_temp',
-            'precipitation'
+            'precipitation',
+            'apparent_mean_temp',
+            'apparent_max_temp',
+            'apparent_min_temp'
         ]
 
         try:
@@ -82,12 +85,27 @@ class CsvGateway:
             precipitation = float(row['precipitation'])
         except ValueError:
             precipitation = None
+        try:
+            apparent_mean_temp = float(row['apparent_mean_temp'])
+        except ValueError:
+            apparent_mean_temp = None
+        try:
+            apparent_max_temp = float(row['apparent_max_temp'])
+        except ValueError:
+            apparent_max_temp = None
+        try:
+            apparent_min_temp = float(row['apparent_min_temp'])
+        except ValueError:
+            apparent_min_temp = None
             
         return WeatherSummary(
             mean_temp,
             max_temp,
             min_temp,
-            precipitation
+            precipitation,
+            apparent_mean_temp,
+            apparent_max_temp,
+            apparent_min_temp
         )
 
     @staticmethod
@@ -100,5 +118,8 @@ class CsvGateway:
             'mean_temp': weather_summary.mean_temp,
             'max_temp': weather_summary.max_temp,
             'min_temp': weather_summary.min_temp,
-            'precipitation': weather_summary.precipitation
+            'precipitation': weather_summary.precipitation,
+            'apparent_mean_temp': weather_summary.apparent_mean_temp,
+            'apparent_max_temp': weather_summary.apparent_max_temp,
+            'apparent_min_temp': weather_summary.apparent_min_temp,            
         }

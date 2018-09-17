@@ -26,14 +26,20 @@ def test_extracts_weather_summary():
         75.1,
         90.4,
         63.9,
-        2
+        2,
+        81.3,
+        96.4,
+        63.4
     )
 
     row = {
         'mean_temp': expected.mean_temp,
         'max_temp': expected.max_temp,
         'min_temp': expected.min_temp,
-        'precipitation': expected.precipitation
+        'precipitation': expected.precipitation,
+        'apparent_mean_temp': expected.apparent_mean_temp,
+        'apparent_max_temp': expected.apparent_max_temp,
+        'apparent_min_temp': expected.apparent_min_temp
     }
 
     actual = CsvGateway._extract_weather_summary(row)
@@ -42,17 +48,23 @@ def test_extracts_weather_summary():
 
 def test_handles_nonfloat_weather_summary_value():
     expected = WeatherSummary(
-        20.1,
-        30.4,
-        10.9,
-        None
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None        
     )
 
     row = {
-        'mean_temp': expected.mean_temp,
-        'max_temp': expected.max_temp,
-        'min_temp': expected.min_temp,
-        'precipitation': 'T'
+        'mean_temp': 'N',
+        'max_temp': 'A',
+        'min_temp': 'T',
+        'precipitation': 'A',
+        'apparent_mean_temp': 'L',
+        'apparent_max_temp': 'I',
+        'apparent_min_temp': 'E'
     }
 
     actual = CsvGateway._extract_weather_summary(row)
@@ -66,7 +78,10 @@ def test_integration_records_weather_summary():
         75.1,
         90.4,
         63.9,
-        2
+        2,
+        81.3,
+        96.4,
+        63.4
     )
 
     subject_location_summary = SubjectLocationSummary(
